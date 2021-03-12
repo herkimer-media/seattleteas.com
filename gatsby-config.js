@@ -1,3 +1,7 @@
+require("dotenv").config({
+	path: `.env.${process.env.NODE_ENV}`,
+});
+
 module.exports = {
 	siteMetadata: {
 		siteUrl: "https://www.seattleteas.com",
@@ -12,12 +16,32 @@ module.exports = {
 			},
 		},
 		{
-			resolve: "gatsby-plugin-robots-txt",
+			resolve: "gatsby-source-wordpress",
 			options: {
-				host: null,
-				policy: [{ disallow: ["/"], userAgent: "*" }],
-				sitemap: null,
+				schema: {
+					previewRequestConcurrency: 2,
+					requestConcurrency: 5,
+				},
+				url: process.env.WPGRAPHQL_URL,
 			},
 		},
+		{
+			resolve: "gatsby-plugin-robots-txt",
+			options: {
+				env: {
+					development: {
+						host: null,
+						policy: [{ disallow: ["/"], userAgent: "*" }],
+						sitemap: null,
+					},
+					production: {
+						policy: [{ allow: "/", userAgent: "*" }],
+					},
+				},
+				host: "https://www.seattleteas.com",
+				sitemap: "https://www.seattleteas.com/sitemap.xml",
+			},
+		},
+		"gatsby-plugin-sitemap",
 	],
 };
